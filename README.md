@@ -21,7 +21,7 @@ Instead of trying to prevent actions, our system logs every action as a permanen
 
 The UI provides a simple interface for officers, while the blockchain backend guarantees data integrity. The system's power is not in stopping a corrupt officer, but in creating an immutable record of their corruption, making it impossible to hide.
 
-Core Features
+Core Features:
 
 Immutable Ledger: Built on a custom Python blockchain, every action (FIR, Evidence, Transfer) is a permanent block.
 
