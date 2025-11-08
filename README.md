@@ -56,7 +56,7 @@ Flask
 Installation
 
 Clone the repository:
-git clone https://github.com/YOUR-USERNAME/kaaval-hackathon-project.git
+git clone https://github.com/winash4567/kaaval-hackathon-project.git
 cd kaaval-hackathon-project
 
 Install Flask:
