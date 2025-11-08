@@ -47,73 +47,51 @@ Case Visualization for Judiciary: A special "Case Mapper" tool for Judges to sel
 
 How to Run This Project
 
-1. Prerequisites
+Prerequisites
 
 Python 3.x
 
 Flask
 
-2. Installation
+Installation
 
 Clone the repository:
-
-git clone [https://github.com/YOUR-USERNAME/kaaval-hackathon-project.git](https://github.com/YOUR-USERNAME/kaaval-hackathon-project.git)
+git clone https://www.google.com/search?q=https://github.com/YOUR-USERNAME/kaaval-hackathon-project.git
 cd kaaval-hackathon-project
 
-
 Install Flask:
-
 python -m pip install Flask
 
-
 Run the application:
-
 python main.py
 
-
 Open your web browser and go to:
-http://127.0.0.1:5000
+https://www.google.com/search?q=http://127.0.0.1:5000
 
 Demo Flow & User Logins
 
 Use these pre-set accounts to test the role-based features.
 Password for all users: pass
 
-Username
+Username: si_state
+Role: SI
+Department: State Police
 
-Role
+Username: si_cyber
+Role: SI
+Department: Cyber Crime
 
-Department
+Username: si_cbi
+Role: SI
+Department: CBI
 
-si_state
+Username: constable_state
+Role: Constable
+Department: State Police
 
-SI
-
-State Police
-
-si_cyber
-
-SI
-
-Cyber Crime
-
-si_cbi
-
-SI
-
-CBI
-
-constable_state
-
-Constable
-
-State Police
-
-judge1
-
-Judge
-
-Judiciary
+Username: judge1
+Role: Judge
+Department: Judiciary
 
 Demo: The "Indisputable Audit"
 
