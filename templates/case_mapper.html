@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Case Mapper - Kaaval Blockchain</title>
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    
+    <!-- Feather Icons -->
+    <script src="https://unpkg.com/feather-icons"></script>
+    <style>
+        :root {
+            --primary-blue: #0d47a1;
+            --primary-yellow: #ffc107;
+            --bg-light: #f0f2f5;
+            --bg-white: #ffffff;
+            --text-dark: #333333;
+            --border-color: #dee2e6;
+            --shadow-md: 0 4px 12px rgba(0,0,0,0.08);
+        }
+        body { font-family: 'Inter', Arial, sans-serif; background: var(--bg-light); margin: 0; padding: 20px; color: var(--text-dark); }
+        .container { max-width: 900px; margin: auto; background: var(--bg-white); padding: 20px 30px; border-radius: 12px; box-shadow: var(--shadow-md); }
+        .header { display: flex; justify-content: space-between; align-items: center; border-bottom: 2px solid var(--border-color); padding-bottom: 20px; margin-bottom: 20px; }
+        .header .logo { font-size: 24px; font-weight: 700; color: var(--primary-blue); display: flex; align-items: center; gap: 10px; }
+        .header .user-info { text-align: right; font-size: 14px; }
+        .header .user-info a { color: var(--primary-blue); text-decoration: none; font-weight: 500; }
+        .header .user-info a:hover { color: #0b3a80; }
+        
+        h1 { text-align: left; color: var(--primary-blue); margin-top: 0; font-weight: 600; }
+        
+        form { background: #f9fafb; padding: 20px; border-radius: 8px; border: 1px solid var(--border-color); }
+        .form-group { margin-bottom: 15px; }
+        .form-group label { display: block; margin-bottom: 8px; font-weight: 600; font-size: 14px; }
+        .form-group select {
+            width: 100%; padding: 10px 12px; border: 1px solid var(--border-color); border-radius: 8px; box-sizing: border-box; font-size: 16px;
+        }
+        
+        button, .button {
+            display: inline-block;
+            text-decoration: none;
+            padding: 10px 15px;
+            background: var(--primary-blue);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 600;
+            font-size: 15px;
+            transition: background-color 0.2s ease, transform 0.1s ease;
+        }
+        button:hover, .button:hover { background: #0b3a80; transform: translateY(-1px); }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <div class="logo">
+                <i data-feather="git-merge"></i>
+                <h1>Visualize Case History</h1>
+            </div>
+            {% if g.user %}
+            <div class="user-info">
+                <a href="/"><i data-feather="home" style="width:14px; height:14px; vertical-align: middle; margin-top: -2px;"></i> Dashboard</a>
+            </div>
+            {% endif %}
+        </div>
+
+        <form action="/case_map_result" method="GET">
+            <div class="form-group">
+                <label for="fir_hash">Select a Case (FIR) to Visualize</label>
+                <select id="fir_hash" name="fir_hash" required>
+                    <option value="">-- Select a Case --</option>
+                    {% for hash, state in fir_state.items() %}
+                    <option value="{{ hash }}">{{ state.fir_block.data['Case ID'] }} (Owner: {{state.current_owner_dept}})</option>
+                    {% endfor %}
+                </select>
+            </div>
+            <button type="submit">Generate Timeline</button>
+        </form>
+
+    </div>
+    <script>
+        feather.replace()
+    </script>
+</body>
+</html>

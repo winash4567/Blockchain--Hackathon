@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Inbox - Kaaval Blockchain</title>
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    
+    <!-- Feather Icons -->
+    <script src="https://unpkg.com/feather-icons"></script>
+
+    <style>
+        :root {
+            --primary-blue: #0d47a1;
+            --primary-yellow: #ffc107;
+            --bg-light: #f0f2f5;
+            --bg-white: #ffffff;
+            --text-dark: #333333;
+            --text-light: #666666;
+            --success: #28a745;
+            --border-color: #dee2e6;
+            --shadow-md: 0 4px 12px rgba(0,0,0,0.08);
+        }
+        body { font-family: 'Inter', Arial, sans-serif; background: var(--bg-light); margin: 0; padding: 20px; color: var(--text-dark); }
+        .container { max-width: 900px; margin: auto; background: var(--bg-white); padding: 20px 30px; border-radius: 12px; box-shadow: var(--shadow-md); }
+        .header { display: flex; justify-content: space-between; align-items: center; border-bottom: 2px solid var(--border-color); padding-bottom: 20px; margin-bottom: 20px; }
+        .header .logo { font-size: 24px; font-weight: 700; color: var(--primary-blue); display: flex; align-items: center; gap: 10px; }
+        .header .user-info { text-align: right; font-size: 14px; }
+        .header .user-info span { font-weight: 600; color: var(--text-dark); }
+        .header .user-info a { color: var(--primary-blue); text-decoration: none; font-weight: 500; margin-left: 15px; transition: color 0.2s ease; }
+        .header .user-info a:hover { color: #0b3a80; }
+        .header .user-info .logout { color: var(--danger); }
+        .header .user-info .logout:hover { color: #b22222; }
+        
+        h1 { text-align: left; color: var(--primary-blue); border-bottom: 2px solid var(--border-color); padding-bottom: 10px; margin-top: 0; font-weight: 600; }
+        .message-list { list-style: none; padding: 0; }
+        .message-item { background: #f9fafb; border: 1px solid var(--border-color); padding: 20px; border-radius: 8px; margin-bottom: 15px; display: flex; justify-content: space-between; align-items: center; gap: 20px; }
+        .message-item-content { flex-grow: 1; font-size: 15px; }
+        .message-item-content strong { color: var(--primary-blue); font-weight: 600; }
+        .message-item-content p { margin: 5px 0; }
+        .message-item-content .case-details { font-size: 14px; color: var(--text-light); background: var(--bg-white); border: 1px solid var(--border-color); padding: 10px; border-radius: 6px; margin-top: 10px; }
+        
+        button { padding: 10px 15px; background: var(--success); color: white; border: none; border-radius: 8px; cursor: pointer; font-weight: 600; font-size: 15px; transition: background-color 0.2s ease, transform 0.1s ease; flex-shrink: 0; }
+        button:hover { background: #218838; transform: translateY(-1px); }
+        button:active { transform: translateY(0); }
+    </style>
+</head>
+<body>
+    <div class="container">
+        
+        <div class="header">
+            <div class="logo">
+                <i data-feather="inbox"></i>
+                <h1>Your Inbox</h1>
+            </div>
+            {% if g.user %}
+            <div class="user-info">
+                <span>{{ g.user.username }} ({{ g.user.department }})</span><br>
+                <a href="/"><i data-feather="home" style="width:14px; height:14px; vertical-align: middle; margin-top: -2px;"></i> Dashboard</a>
+                <a href="/logout" class="logout"><i data-feather="log-out" style="width:14px; height:14px; vertical-align: middle; margin-top: -2px;"></i> Logout</a>
+            </div>
+            {% endif %}
+        </div>
+
+        <ul class="message-list">
+            {% for item in messages_with_index %}
+            {% set msg = item.message %}
+            <li class="message-item">
+                <div class="message-item-content">
+                    <p>
+                        <strong>{{ msg.requester_info.username }}</strong> from
+                        <strong>{{ msg.requester_info.department }}</strong> is requesting access to:
+                    </p>
+                    <div class="case-details">
+                        <strong>Case ID:</strong> {{ msg.fir_case_id }}
+                    </div>
+                </div>
+                <div class="message-item-actions">
+                    <!-- This form posts to the approve route -->
+                    <form action="/approve_request/{{ item.original_index }}" method="POST">
+                        <button type="submit">
+                            <i data-feather="check-circle" style="width:16px; height:16px; vertical-align: middle; margin-top: -2px;"></i>
+                            Approve & Add to Ledger
+                        </button>
+                    </form>
+                </div>
+            </li>
+            {% else %}
+            <li style="text-align: center; color: var(--text-light); padding: 20px; background: none; border: none;">Your inbox is empty.</li>
+            {% endfor %}
+        </ul>
+        
+    </div>
+    
+    <script>
+        feather.replace()
+    </script>
+</body>
+</html>

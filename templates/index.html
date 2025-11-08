@@ -1,0 +1,496 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Kaaval - Evidence Blockchain</title>
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    
+    <!-- Feather Icons -->
+    <script src="https://unpkg.com/feather-icons"></script>
+
+    <style>
+        :root {
+            --primary-blue: #0d47a1;
+            --primary-yellow: #ffc107;
+            --bg-light: #f0f2f5;
+            --bg-white: #ffffff;
+            --text-dark: #333333;
+            --text-light: #666666;
+            --success: #28a745;
+            --danger: #dc3545;
+            --warning: #ffc107;
+            --info: #17a2b8;
+            --border-color: #dee2e6;
+            --shadow-sm: 0 1px 3px rgba(0,0,0,0.05);
+            --shadow-md: 0 4px 12px rgba(0,0,0,0.08);
+        }
+        body { font-family: 'Inter', Arial, sans-serif; background: var(--bg-light); margin: 0; padding: 20px; color: var(--text-dark); }
+        .container { max-width: 1000px; margin: auto; background: var(--bg-white); padding: 20px 30px; border-radius: 12px; box-shadow: var(--shadow-md); }
+        .header { display: flex; justify-content: space-between; align-items: center; border-bottom: 2px solid var(--border-color); padding-bottom: 20px; margin-bottom: 20px; }
+        .header .logo { font-size: 24px; font-weight: 700; color: var(--primary-blue); display: flex; align-items: center; gap: 10px; }
+        .header .user-info { text-align: right; font-size: 14px; }
+        .header .user-info span { font-weight: 600; color: var(--text-dark); }
+        .header .user-info a { color: var(--primary-blue); text-decoration: none; font-weight: 500; margin-left: 15px; transition: color 0.2s ease; }
+        .header .user-info a:hover { color: #0b3a80; }
+        .header .user-info .logout { color: var(--danger); }
+        .header .user-info .logout:hover { color: #b22222; }
+        
+        h2 { text-align: left; color: var(--primary-blue); border-bottom: 2px solid var(--border-color); padding-bottom: 10px; margin-top: 30px; font-weight: 600; }
+        h3 { font-weight: 600; color: var(--text-dark); margin-top: 25px; }
+        h4 { font-weight: 600; color: var(--text-dark); margin: 15px 0 10px 0; }
+        
+        /* Form Layout */
+        .form-container {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+        }
+        @media (max-width: 768px) {
+            .form-container { grid-template-columns: 1fr; }
+        }
+        
+        form { background: #f9fafb; padding: 20px; border-radius: 8px; border: 1px solid var(--border-color); }
+        .form-group { margin-bottom: 15px; }
+        .form-group label { display: block; margin-bottom: 8px; font-weight: 600; font-size: 14px; }
+        .form-group input[type="text"], .form-group select, .form-group textarea, .form-group input[type="file"] {
+            width: 100%; padding: 10px 12px; border: 1px solid var(--border-color); border-radius: 8px; box-sizing: border-box; font-size: 16px;
+        }
+        .form-group input:focus, .form-group select:focus, .form-group textarea:focus {
+            border-color: var(--primary-blue); box-shadow: 0 0 0 3px rgba(13, 71, 161, 0.1); outline: none;
+        }
+        .form-group input[readonly] { background: #e9ecef; }
+        
+        button, .button {
+            display: inline-block;
+            text-decoration: none;
+            padding: 10px 15px;
+            background: var(--primary-blue);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 600;
+            font-size: 15px;
+            transition: background-color 0.2s ease, transform 0.1s ease;
+        }
+        button:hover, .button:hover { background: #0b3a80; transform: translateY(-1px); }
+        button:active, .button:active { transform: translateY(0); }
+        
+        .spinner { display: none; width: 20px; height: 20px; border: 3px solid #f3f3f3; border-top: 3px solid var(--primary-blue); border-radius: 50%; animation: spin 1s linear infinite; }
+        @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+        
+        /* Block & FIR Case Styling */
+        .case-block { background: var(--bg-white); border: 1px solid var(--border-color); padding: 20px; margin-bottom: 15px; border-radius: 8px; box-shadow: var(--shadow-sm); }
+        .case-header { display: flex; justify-content: space-between; align-items: flex-start; }
+        .case-header h3 { margin-top: 0; color: var(--primary-blue); }
+        .case-header-tags { display: flex; gap: 10px; }
+        .tag { font-size: 12px; font-weight: 600; padding: 4px 8px; border-radius: 6px; display: inline-block; }
+        .granted-tag { color: var(--success); background: #d4edda; }
+        .owner-tag { color: var(--text-dark); background: #e0e0e0; }
+        
+        .data-list { list-style: none; padding-left: 0; margin-top: 10px; }
+        .data-list li { padding: 8px 0; border-bottom: 1px solid #f0f0f0; display: flex; }
+        .data-list li:last-child { border-bottom: none; }
+        .data_list li strong { color: var(--text-light); width: 180px; flex-shrink: 0; }
+        
+        .evidence-list { margin-left: 20px; border-left: 3px solid var(--primary-blue); padding-left: 20px; }
+        .evidence-block { background: #f9fafb; border: 1px solid var(--border-color); padding: 15px; margin-top: 10px; border-radius: 6px; }
+        .evidence-block .data-list li strong { width: 150px; }
+        
+        .block-hash { font-family: 'Courier New', Courier, monospace; font-size: 14px; color: var(--text-light); background: #f9fafb; padding: 8px; border-radius: 4px; margin-top: 5px; word-break: break-all; }
+        
+        .message { padding: 15px; margin-bottom: 20px; border-radius: 8px; text-align: center; font-weight: 500; border: 1px solid; }
+        .success { background: #d4edda; color: #155724; border-color: #c3e6cb; }
+        .danger { background: #f8d7da; color: #721c24; border-color: #f5c6cb; }
+        .warning { background: #fff3cd; color: #856404; border-color: #ffeeba; }
+
+        .other-firs-list { list-style: none; padding: 0; }
+        .other-fir-item { display: flex; justify-content: space-between; align-items: center; padding: 15px 20px; background: #f9fafb; border: 1px solid var(--border-color); border-radius: 8px; margin-bottom: 10px; }
+        .other-fir-item button { background: var(--warning); color: var(--text-dark); font-size: 14px; padding: 8px 12px; }
+        .other-fir-item button:hover { background: #e6b000; }
+        .other-fir-item button:disabled { background: #e0e0e0; color: #999; cursor: not-allowed; transform: none; }
+        
+        .transfer-form { background: #fffbef; border: 1px dashed var(--warning); padding: 15px; margin-top: 20px; border-radius: 8px; }
+        .transfer-form h4 { margin-top: 0; color: #856404; }
+        .transfer-form .form-group { display: flex; gap: 10px; align-items: center; }
+        .transfer-form .form-group label { flex-basis: 100px; }
+        .transfer-form .form-group select, .transfer-form .form-group input { flex: 1; }
+        .transfer-form button { background: var(--warning); color: var(--text-dark); }
+        .transfer-form button:hover { background: #e6b000; }
+        
+        .audit-log-block { background: #fdfdfd; border: 1px solid #eee; }
+        .block-type-tag { font-size: 12px; font-weight: 600; padding: 4px 8px; border-radius: 6px; display: inline-block; }
+        .tag-evidence { color: #004085; background-color: #cce5ff; }
+        .tag-grant { color: #155724; background-color: #d4edda; }
+        .tag-transfer { color: #856404; background-color: #fff3cd; }
+        
+        /* NEW: Judge Tools */
+        .judge-tools {
+            background: #f0f2f5;
+            padding: 20px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            text-align: center;
+        }
+        .judge-tools h3 { margin-top: 0; }
+        .judge-tools .button {
+            background: var(--primary-yellow);
+            color: var(--text-dark);
+            font-size: 16px;
+        }
+        .judge-tools .button:hover {
+            background: #e6b000;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        
+        <div class="header">
+            <div class="logo">
+                <i data-feather="shield"></i>
+                <span>Kaaval Chain</span>
+            </div>
+            {% if g.user %}
+            <div class="user-info">
+                Welcome, <span>{{ g.user.username }} ({{ g.user.department }})</span><br>
+                <a href="/inbox"><i data-feather="inbox" style="width:14px; height:14px; vertical-align: middle; margin-top: -2px;"></i> Inbox ({{ g.inbox_count }})</a>
+                <a href="/logout" class="logout"><i data-feather="log-out" style="width:14px; height:14px; vertical-align: middle; margin-top: -2px;"></i> Logout</a>
+            </div>
+            {% endif %}
+        </div>
+        
+        {% with messages = get_flashed_messages(with_categories=true) %}
+            {% if messages %}
+                {% for category, message in messages %}
+                    <div class="message {{ category }}">{{ message }}</div>
+                {% endfor %}
+            {% endif %}
+        {% endwith %}
+
+        <!-- NEW: Judge Tools Section -->
+        {% if g.user and g.user.role == 'Judge' %}
+        <div class="judge-tools">
+            <h3>Judge's Toolkit</h3>
+            <a href="/case_mapper" class="button">
+                <i data-feather="git-merge" style="width:18px; height:18px; vertical-align: middle; margin-top: -2px; margin-right: 5px;"></i>
+                Visualize Case History (Mapper)
+            </a>
+        </div>
+        {% endif %}
+
+        <!-- SI Forms (Register FIR, Add Evidence) -->
+        {% if g.user and g.user.role == 'SI' %}
+        <div class="form-container">
+            <!-- Form 1: Register New FIR -->
+            <form action="/register_fir" method="POST">
+                <h3>Register New FIR</h3>
+                <div class="form-group">
+                    <label for="case_id">Case ID / FIR Number</label>
+                    <input type="text" id="case_id" name="case_id" required>
+                </div>
+                <div class="form-group">
+                    <label for="sections">Sections Applied</label>
+                    <input type="text" id="sections" name="sections" placeholder="e.g., IPC 302, 307">
+                </div>
+                <div class="form-group">
+                    <label for="complainant">Complainant</label>
+                    <input type="text" id="complainant" name="complainant">
+                </div>
+                 <div class="form-group">
+                    <label for="location">Location of Incident</label>
+                    <input type="text" id="location" name="location">
+                </div>
+                <div class="form-group">
+                    <label for="notes">Notes</label>
+                    <textarea id="notes" name="notes" rows="3"></textarea>
+                </div>
+                <button type="submit">Register FIR on Blockchain</button>
+            </form>
+            
+            <!-- Form 2: Add Evidence to FIR -->
+            <form action="/add_evidence" method="POST">
+                <h3>Add Evidence to Existing FIR</h3>
+                
+                <div class="form-group">
+                    <label for="linked_fir_hash">Select FIR (Case)</label>
+                    <select id="linked_fir_hash" name="linked_fir_hash" required>
+                        <option value="">-- Select an FIR you own --</option>
+                        {% for item in visible_firs %}
+                            {% if item.current_owner_dept == g.user.department %}
+                            <option value="{{ item.fir_block.hash }}">{{ item.fir_block.data['Case ID'] }}</option>
+                            {% endif %}
+                        {% endfor %}
+                    </select>
+                </div>
+                
+                <div class="form-group">
+                    <label for="evidence_type">Evidence Type</label>
+                    <select id="evidence_type" name="evidence_type" onchange="toggleFields()">
+                        <option>Video</option> <option>Audio</option> <option>Document</option>
+                        <option>Physical</option> <option>Other</option>
+                    </select>
+                </div>
+                
+                <div class="form-group" id="file_uploader_group">
+                    <label for="file_uploader">Upload Evidence File (to calculate hash)</label>
+                    <input type="file" id="file_uploader">
+                </div>
+    
+                <div class="form-group">
+                    <label for="description" id="description_label">Evidence File Hash (auto-generated)</label>
+                    <div style="display: flex; align-items: center; gap: 10px;">
+                        <input type="text" id="description" name="description" required readonly style="flex: 1;">
+                        <div class="spinner" id="hash_spinner"></div>
+                    </div>
+                </div>
+                
+                <div class="form-group">
+                    <label for="officer_name">Collecting Officer</label>
+                    <input type="text" id="officer_name" name="officer_name" value="{{ g.user.username }}" readonly>
+                </div>
+                <div class="form-group">
+                    <label for="storage_location">Storage Location</label>
+                    <input type="text" id="storage_location" name="storage_location" placeholder="e.g., 'Evidence Locker 7A'">
+                </div>
+                <button type="submit">Add Evidence to FIR</button>
+            </form>
+        </div>
+        {% endif %}
+        
+        <!-- 4. Display the Chain (Your Dept + Granted) -->
+        <h2>Your Department's Cases (FIRs)</h2>
+        <div>
+            {% for item in visible_firs | reverse %}
+            {% set fir_block = item.fir_block %}
+            <div class="case-block">
+                <div class="case-header">
+                    <h3>Case ID: {{ fir_block.data['Case ID'] }}</h3>
+                    <div class="case-header-tags">
+                        {% if item.granted_access %}<span class="tag granted-tag">Read Access Granted</span>{% endif %}
+                        <span class="tag owner-tag">Owner: {{ item.current_owner_dept }}</span>
+                    </div>
+                </div>
+                
+                <h4>FIR Details (Block #: {{ item.index }})</h4>
+                <ul class="data-list">
+                    {% for key, value in fir_block.data.items() %}
+                        {% if key != 'block_type' and key != 'department' %}
+                        <li><strong>{{ key }}:</strong> {{ value }}</li>
+                        {% endif %}
+                    {% endfor %}
+                </ul>
+                
+                <h4>Evidence for this FIR</h4>
+                <div class="evidence-list">
+                    {% for ev_block in item.evidence %}
+                    <div class="evidence-block">
+                        <ul class="data-list">
+                             {% for key, value in ev_block.data.items() %}
+                                {% if key != 'block_type' and key != 'linked_fir_hash' %}
+                                <li><strong>{{ key }}:</strong> {{ value }}</li>
+                                {% endif %}
+                            {% endfor %}
+                        </ul>
+                    </div>
+                    {% else %}
+                    <p style="color: var(--text-light); font-style: italic;">No evidence has been added to this FIR.</p>
+                    {% endfor %}
+                </div>
+
+                <!-- TRANSFER FORM -->
+                {% if g.user.role == 'SI' and item.current_owner_dept == g.user.department %}
+                <div class="transfer-form">
+                    <h4>Transfer Case Ownership</h4>
+                    <form action="/transfer_case/{{ fir_block.hash }}" method="POST">
+                        <div class="form-group" style="margin-bottom: 0;">
+                            <label for="new_dept-{{item.index}}" class="sr-only">New Dept:</label>
+                            <select id="new_dept-{{item.index}}" name="new_dept" style="flex: 1;">
+                                <option value="">-- Select New Dept --</option>
+                                {% for dept in g.all_departments %}
+                                    <option>{{ dept }}</option>
+                                {% endfor %}
+                            </select>
+                            <label for="new_officer-{{item.index}}" class="sr-only">New Officer:</label>
+                            <input type="text" id="new_officer-{{item.index}}" name="new_officer_username" placeholder="New Officer Username" style="flex: 1;" required>
+                            <button type="submit" style="flex-shrink: 0;">Transfer</button>
+                        </div>
+                    </form>
+                </div>
+                {% endif %}
+            </div>
+            {% else %}
+            <p style="padding: 10px; text-align: center; color: var(--text-light);">No cases found for your department.</p>
+            {% endfor %}
+        </div>
+        
+        <!-- 5. Other Department Cases (Requestable) -->
+        {% if g.user.role != 'Judge' %}
+        <h2>Cases from Other Departments</h2>
+        <ul class="other-firs-list">
+            {% for item in other_firs | reverse %}
+            {% set fir_block = item.fir_block %}
+            <li class="other-fir-item">
+                <div>
+                    <strong>Case ID:</strong> {{ fir_block.data['Case ID'] }}<br>
+                    <strong>Current Dept:</strong> {{ item.current_owner_dept }}
+                </div>
+                {% if item.request_is_pending %}
+                    <button disabled>Request Pending</button>
+                {% else %}
+                <form action="/request_access/{{ fir_block.hash }}" method="POST" style="margin: 0;">
+                    <button type="submit">Request Access</button>
+                </form>
+                {% endif %}
+            </li>
+            {% else %}
+            <li style="border: none; background: none; color: var(--text-light); justify-content: center;">No cases found from other departments.</li>
+            {% endfor %}
+        </ul>
+        {% endif %}
+        
+        <!-- 6. AUDIT LOG (Judge-Only) -->
+        {% if g.user and g.user.role == 'Judge' %}
+        
+        <h2>Full Chain of Custody (Audit Log)</h2>
+        
+        <h3>Ownership Transfers</h3>
+        <div>
+            {% for block in all_transfer_blocks | reverse %}
+            <div class="case-block audit-log-block">
+                 <div class="block-header">
+                    <strong>Transfer Block</strong>
+                    <span class="tag tag-transfer">TRANSFER</span>
+                </div>
+                <ul class="data-list">
+                    <li><strong>Case ID:</strong> {{ block.data['case_id'] }}</li>
+                    <li><strong>From Dept:</strong> {{ block.data.previous_dept }} ({{ block.data.previous_officer_username }})</li>
+                    <li><strong>To Dept:</strong> {{ block.data.new_dept }} ({{ block.data.new_officer_username }})</li>
+                </ul>
+                <p><strong>Timestamp:</strong> {{ block.timestamp }}</p>
+                <div class="block-hash">{{ block.hash }}</div>
+            </div>
+            {% else %}
+            <p style="padding: 10px; text-align: center; color: var(--text-light);">No ownership transfers have been issued.</p>
+            {% endfor %}
+        </div>
+        
+        <h3>Access Grants</h3>
+        <div>
+            {% for block in all_grant_blocks | reverse %}
+            <div class="case-block audit-log-block">
+                 <div class="block-header">
+                    <strong>Access Grant Block</strong>
+                    <span class="tag tag-grant">GRANT</span>
+                </div>
+                <ul class="data-list">
+                    <li><strong>Case ID:</strong> {{ block.data['case_id'] }}</li>
+                    <li><strong>Granting Officer:</strong> {{ block.data.granter_username }} ({{ block.data.granter_dept }})</li>
+                    <li><strong>Requesting Dept:</strong> {{ block.data.requester_dept }}</li>
+                </ul>
+                <p><strong>Timestamp:</strong> {{ block.timestamp }}</to>
+                <div class="block-hash">{{ block.hash }}</div>
+            </div>
+            {% else %}
+            <p style="padding: 10px; text-align: center; color: var(--text-light);">No access grants have been issued.</p>
+            {% endfor %}
+        </div>
+        
+        <h3>Evidence Blocks</h3>
+        <div>
+            {% for block in all_evidence_blocks | reverse %}
+            <div class="case-block audit-log-block">
+                 <div class="block-header">
+                    <strong>Evidence Block</strong>
+                    <span class="tag tag-evidence">EVIDENCE</span>
+                </div>
+                <ul class="data-list">
+                    <li><strong>Linked Case ID:</strong> 
+                        <!-- *** THIS IS THE FIX *** -->
+                        <!-- We now use the fir_state dict we passed in -->
+                        {% if block.data.linked_fir_hash in fir_state %}
+                            {{ fir_state[block.data.linked_fir_hash].fir_block.data['Case ID'] }}
+                        {% else %}
+                            Unknown/Unlinked
+                        {% endif %}
+                    </li>
+                    <li><strong>Evidence Type:</strong> {{ block.data['Evidence Type'] }}</li>
+                    <li><strong>Description:</strong> <span style="font-family: 'Courier New', monospace; font-size: 14px;">{{ block.data['Evidence File/Description'][:40] }}...</span></li>
+                    <li><strong>Officer:</strong> {{ block.data.added_by_user }} ({{ block.data.added_by_dept }})</li>
+                </ul>
+                <p><strong>Timestamp:</strong> {{ block.timestamp }}</p>
+                <div class="block-hash">{{ block.hash }}</div>
+            </div>
+            {% else %}
+            <p style="padding: 10px; text-align: center; color: var(--text-light);">No evidence has been added.</p>
+            {% endfor %}
+        </div>
+        
+        {% endif %} <!-- END OF JUDGE-ONLY SECTION -->
+
+    </div>
+
+    <!-- JAVASCRIPT FOR FORM LOGIC (Unchanged) -->
+    <script>
+        feather.replace()
+    
+        // Add a check for the file uploader element
+        const fileUploader = document.getElementById('file_uploader');
+        if (fileUploader) {
+            fileUploader.addEventListener('change', async (event) => {
+                const file = event.target.files[0];
+                if (!file) { return; }
+                document.getElementById('hash_spinner').style.display = 'inline-block';
+                const hashField = document.getElementById('description');
+                hashField.value = "Calculating hash...";
+                try {
+                    const buffer = await file.arrayBuffer();
+                    const hashBuffer = await crypto.subtle.digest('SHA-256', buffer);
+                    const hashArray = Array.from(new Uint8Array(hashBuffer));
+                    const hashHex = hashArray.map(b => b.toString(16).padStart(2, '0')).join('');
+                    hashField.value = hashHex;
+                } catch (error) {
+                    console.error("Hash calculation error:", error);
+                    hashField.value = "Error calculating hash.";
+                } finally {
+                    document.getElementById('hash_spinner').style.display = 'none';
+                }
+            });
+        }
+
+        function toggleFields() {
+            const evidenceType = document.getElementById('evidence_type');
+            if (!evidenceType) return; // Exit if not on the page
+
+            const fileUploaderGroup = document.getElementById('file_uploader_group');
+            const descriptionLabel = document.getElementById('description_label');
+            const descriptionField = document.getElementById('description');
+
+            if (evidenceType.value === 'Video' || evidenceType.value === 'Audio' || evidenceType.value === 'Document') {
+                fileUploaderGroup.style.display = 'block';
+                descriptionLabel.textContent = 'Evidence File Hash (auto-generated)';
+                descriptionField.readOnly = true;
+                descriptionField.value = '';
+                descriptionField.placeholder = '';
+            } else { 
+                fileUploaderGroup.style.display = 'none';
+                descriptionField.readOnly = false;
+                descriptionField.value = '';
+                
+                if (evidenceType.value === 'Physical') {
+                    descriptionLabel.textContent = 'Physical Item Serial Number / Description';
+                    descriptionField.placeholder = 'e.g., Gun, SN: 987654';
+                } else { // "Other"
+                    descriptionLabel.textContent = 'Evidence File/Description';
+                    descriptionField.placeholder = 'e.g., Witness testimony notes';
+                }
+            }
+        }
+        document.addEventListener('DOMContentLoaded', toggleFields);
+    </script>
+</body>
+</html>

@@ -1,0 +1,180 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Case Timeline - Kaaval Blockchain</title>
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    
+    <!-- Feather Icons -->
+    <script src="https://unpkg.com/feather-icons"></script>
+    <style>
+        :root {
+            --primary-blue: #0d47a1;
+            --primary-yellow: #ffc107;
+            --bg-light: #f0f2f5;
+            --bg-white: #ffffff;
+            --text-dark: #333333;
+            --text-light: #666666;
+            --success: #28a745;
+            --danger: #dc3545;
+            --warning: #ffc107;
+            --info: #17a2b8;
+            --border-color: #dee2e6;
+            --shadow-md: 0 4px 12px rgba(0,0,0,0.08);
+        }
+        body { font-family: 'Inter', Arial, sans-serif; background: var(--bg-light); margin: 0; padding: 20px; color: var(--text-dark); }
+        .container { max-width: 900px; margin: auto; background: var(--bg-white); padding: 20px 30px; border-radius: 12px; box-shadow: var(--shadow-md); }
+        .header { display: flex; justify-content: space-between; align-items: center; border-bottom: 2px solid var(--border-color); padding-bottom: 20px; margin-bottom: 20px; }
+        .header .logo { font-size: 24px; font-weight: 700; color: var(--primary-blue); display: flex; align-items: center; gap: 10px; }
+        .header .user-info { text-align: right; font-size: 14px; }
+        .header .user-info a { color: var(--primary-blue); text-decoration: none; font-weight: 500; }
+        .header .user-info a:hover { color: #0b3a80; }
+        
+        h1, h2 { text-align: left; color: var(--primary-blue); margin-top: 0; font-weight: 600; }
+        h2 { margin-top: 30px; border-bottom: 2px solid var(--border-color); padding-bottom: 10px;}
+        
+        .case-block { background: var(--bg-white); border: 2px solid var(--primary-blue); padding: 20px; margin-bottom: 15px; border-radius: 8px; }
+        .data-list { list-style: none; padding-left: 0; margin-top: 10px; }
+        .data-list li { padding: 8px 0; border-bottom: 1px solid #f0f0f0; display: flex; }
+        .data-list li:last-child { border-bottom: none; }
+        .data-list li strong { color: var(--text-light); width: 180px; flex-shrink: 0; }
+        .block-hash { font-family: 'Courier New', Courier, monospace; font-size: 14px; color: var(--text-light); background: #f9fafb; padding: 8px; border-radius: 4px; margin-top: 5px; word-break: break-all; }
+
+        /* TIMELINE "TREE" */
+        .timeline { list-style: none; padding: 0; margin-top: 20px; }
+        .timeline-item {
+            position: relative;
+            padding: 10px 10px 20px 40px;
+            border-left: 3px solid var(--primary-blue);
+        }
+        .timeline-item:last-child { border-left: 3px solid transparent; }
+        
+        .timeline-icon {
+            position: absolute;
+            left: -16px;
+            top: 12px;
+            width: 30px;
+            height: 30px;
+            border-radius: 50%;
+            background: var(--bg-white);
+            border: 3px solid var(--primary-blue);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .timeline-content {
+            background: #f9fafb;
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            padding: 15px;
+        }
+        .timeline-content h4 {
+            margin: 0 0 10px 0;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        .timeline-content .timestamp {
+            font-size: 12px;
+            color: var(--text-light);
+            font-weight: 500;
+            margin-bottom: 10px;
+        }
+        
+        .tag-evidence { color: #004085; border: 1px solid #cce5ff; }
+        .tag-grant { color: #155724; border: 1px solid #d4edda; }
+        .tag-transfer { color: #856404; border: 1px solid #fff3cd; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <div class="logo">
+                <i data-feather="git-merge"></i>
+                <h1>Case Timeline: {{ fir_block.data['Case ID'] }}</h1>
+            </div>
+            {% if g.user %}
+            <div class="user-info">
+                <a href="/case_mapper"><i data-feather="arrow-left" style="width:14px; height:14px; vertical-align: middle; margin-top: -2px;"></i> Back to Mapper</a>
+            </div>
+            {% endif %}
+        </div>
+
+        <!-- 1. The "Trunk" of the tree: The FIR -->
+        <h2>Case Details (The Root)</h2>
+        <div class="case-block">
+            <ul class="data-list">
+                {% for key, value in fir_block.data.items() %}
+                    {% if key != 'block_type' %}
+                    <li><strong>{{ key }}:</strong> {{ value }}</li>
+                    {% endif %}
+                {% endfor %}
+            </ul>
+            <p><strong>Timestamp:</strong> {{ fir_block.timestamp }}</p>
+            <p><strong>Block Hash (FIR Hash):</strong></p>
+            <div class="block-hash">{{ fir_block.hash }}</div>
+        </div>
+
+        <!-- 2. The "Branches": The Chronological Events -->
+        <h2>Case History (Chronological)</h2>
+        <ol class="timeline">
+            {% for block in event_list %}
+                <li class="timeline-item">
+                    
+                    {% if block.data.block_type == 'EVIDENCE' %}
+                    <div class="timeline-icon tag-evidence"><i data-feather="file-plus"></i></div>
+                    <div class="timeline-content">
+                        <h4><i data-feather="file-plus" style="color: #004085;"></i>New Evidence Added</h4>
+                        <div class="timestamp">{{ block.timestamp }}</div>
+                        <ul class="data-list">
+                            <li><strong>Officer:</strong> {{ block.data.added_by_user }} ({{block.data.added_by_dept}})</li>
+                            <li><strong>Type:</strong> {{ block.data['Evidence Type'] }}</li>
+                            <li><strong>Description:</strong> <span style="font-family: 'Courier New', monospace;">{{ block.data['Evidence File/Description'][:40] }}...</span></li>
+                            <li><strong>Location:</strong> {{ block.data['Storage Location'] }}</li>
+                        </ul>
+                    </div>
+                    
+                    {% elif block.data.block_type == 'ACCESS_GRANT' %}
+                    <div class="timeline-icon tag-grant"><i data-feather="check-circle"></i></div>
+                    <div class="timeline-content">
+                        <h4><i data-feather="check-circle" style="color: #155724;"></i>Access Granted</h4>
+                        <div class="timestamp">{{ block.timestamp }}</div>
+                        <ul class="data-list">
+                            <li><strong>Granting Officer:</strong> {{ block.data.granter_username }} ({{block.data.granter_dept}})</li>
+                            <li><strong>Granted To:</strong> {{ block.data.requester_dept }}</li>
+                        </ul>
+                    </div>
+                    
+                    {% elif block.data.block_type == 'TRANSFER_OWNERSHIP' %}
+                    <div class="timeline-icon tag-transfer"><i data-feather="arrow-right-circle"></i></div>
+                    <div class="timeline-content">
+                        <h4><i data-feather="arrow-right-circle" style="color: #856404;"></i>Ownership Transferred</h4>
+                        <div class="timestamp">{{ block.timestamp }}</div>
+                        <ul class="data-list">
+                            <li><strong>From Officer:</strong> {{ block.data.previous_officer_username }} ({{block.data.previous_dept}})</li>
+                            <li><strong>To Officer:</strong> {{ block.data.new_officer_username }} ({{block.data.new_dept}})</li>
+                        </ul>
+                    </div>
+                    {% endif %}
+                </li>
+            {% else %}
+            <li>
+                <div class="timeline-content" style="background: none; border: none;">
+                    <p style="color: var(--text-light); font-style: italic;">No evidence, grants, or transfers have been logged for this FIR yet.</p>
+                </div>
+            </li>
+            {% endfor %}
+        </ol>
+
+    </div>
+    <script>
+        feather.replace()
+    </script>
+</body>
+</html>
