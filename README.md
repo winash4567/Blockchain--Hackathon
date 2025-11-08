@@ -45,6 +45,8 @@ Ownership Transfers: An SI can transfer full case ownership to another departmen
 
 Case Visualization for Judiciary: A special "Case Mapper" tool for Judges to select any FIR and instantly see a clean, chronological timeline of every event in its history (creation, evidence added, grants, transfers).
 
+Additional scopes to be committed.
+
 How to Run This Project
 
 Prerequisites
