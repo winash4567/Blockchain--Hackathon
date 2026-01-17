@@ -1,7 +1,3 @@
-Here is a professional, high-quality `README.md` file formatted for GitHub.
-
-I have structured it exactly like popular open-source projects, with sections for **Features**, **Installation**, **Configuration**, and **Usage**.
-
 **Instructions:**
 1.  Create a file named `README.md` in your project folder.
 2.  Paste the text below into it.
