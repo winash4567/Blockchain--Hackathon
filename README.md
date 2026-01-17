@@ -39,10 +39,6 @@
 ## ⚙️ Installation & Setup
 
 ### 1. Clone the Repository
-```bash
-git clone https://github.com/yourusername/kaaval-chain.git
-cd kaaval-chain
-```
 
 ### 2. Install Dependencies
 You need Python installed. Run the following command to install the required lightweight libraries:
