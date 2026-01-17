@@ -1,72 +1,128 @@
-# Blockchain--Hackathon
-Blockchain-based evidence ledger for T.N. Kaaval Hackathon 2025.
+Here is a professional, high-quality `README.md` file formatted for GitHub.
 
-Kaaval Chain: A Blockchain-Based Evidence Ledger
+I have structured it exactly like popular open-source projects, with sections for **Features**, **Installation**, **Configuration**, and **Usage**.
 
-A project for the Kaaval Hackathon, hosted by the Tamil Nadu Government.
+**Instructions:**
+1.  Create a file named `README.md` in your project folder.
+2.  Paste the text below into it.
+3.  (Optional) Take screenshots of your Dashboard and Case Mapper, name them `dashboard.png` and `timeline.png`, and add them to your folder to make the images appear.
 
-Kaaval Chain is a secure, immutable, and auditable web application designed to solve the problem of maintaining the Chain of Custody for digital and physical evidence.
+---
 
-This prototype addresses the hackathon problem statement: "Blockchain-based chain-of-custody system for tamper-proof digital evidence."
+```markdown
+# 🛡️ Kaaval Chain: Immutable Evidence Management System
 
-The Problem
+![Python](https://img.shields.io/badge/Python-3.x-blue?style=for-the-badge&logo=python)
+![Flask](https://img.shields.io/badge/Flask-Web_Framework-red?style=for-the-badge&logo=flask)
+![IPFS](https://img.shields.io/badge/IPFS-Pinata-green?style=for-the-badge&logo=ipfs)
+![Status](https://img.shields.io/badge/Status-Prototype-orange?style=for-the-badge)
 
-In a complex investigation, evidence passes through many hands (officers, departments, labs, and courts). Maintaining a verifiable log of "who touched what, and when" is a critical challenge. Traditional ledgers can be lost, altered, or tampered with.
+**Kaaval Chain** is a blockchain-based digital ledger designed to maintain the Chain of Custody for forensic evidence. Built for the **T.N. Kaaval Hackathon 2025**, it solves the problem of evidence tampering by creating an immutable, decentralized record of every action taken by police officers and the judiciary.
 
-Our Solution
+---
 
-Kaaval Chain solves this by using a private blockchain as a perfect, un-bribable witness.
+## 🚀 Key Features
 
-Instead of trying to prevent actions, our system logs every action as a permanent, timestamped, and cryptographically signed block on the chain. It is impossible to edit or delete the past.
+### 🔗 Core Blockchain
+*   **Immutable Ledger:** Every FIR, evidence addition, and transfer is recorded as a block linked by cryptographic hashes (SHA-256).
+*   **Data Persistence:** The blockchain state is automatically saved to disk (`chain_data.json`), ensuring data survives server restarts.
+*   **Audit Trail:** Complete, unalterable history of who touched the evidence and when.
 
-The UI provides a simple interface for officers, while the blockchain backend guarantees data integrity. The system's power is not in stopping a corrupt officer, but in creating an immutable record of their corruption, making it impossible to hide.
+### 🌐 Decentralized Storage (Web3)
+*   **IPFS Integration:** Digital evidence (images/docs) is uploaded to **IPFS** via Pinata.
+*   **Tamper-Proof:** The blockchain stores the IPFS CID (Content Identifier). If the file is altered by even one pixel, the link becomes invalid.
 
-Core Features:
+### 🔫 Physical-to-Digital Bridge
+*   **QR Code Generation:** Automatically generates QR codes for physical evidence (e.g., weapons).
+*   **Instant Verification:** Scanning the QR code with a mobile device instantly loads the digital history of that specific item.
 
-Immutable Ledger: Built on a custom Python blockchain, every action (FIR, Evidence, Transfer) is a permanent block.
+### 👥 Role-Based Access Control (RBAC)
+*   **Sub-Inspector (SI):** Register FIRs, Add Evidence, Transfer Cases.
+*   **Constable:** View Department cases, Request Access to other departments.
+*   **Judge:** Full view of the Audit Log and Visual Case Mapping.
 
-FIR-Based Case Model: All evidence and actions are logically linked to a primary FIR (First Information Report) block.
+---
 
-Role-Based Access Control:
+## 🛠️ Tech Stack
 
-SI (Sub-Inspector): Can register new FIRs, add evidence (physical or digital), and transfer case ownership.
+*   **Backend:** Python 3, Flask
+*   **Blockchain Logic:** Custom Python implementation (SHA-256)
+*   **Frontend:** HTML5, CSS3, JavaScript (CryptoJS for client-side hashing)
+*   **Storage:** Local JSON (Ledger), Pinata IPFS (Files)
+*   **Tools:** `qrcode` library, `urllib` (Standard Lib)
 
-Constable: Can view their department's cases and request access to others.
+---
 
-Judge: Has high-level read-only access to all cases and the complete, unfiltered audit log.
+## ⚙️ Installation & Setup
 
-Digital Evidence Hashing: The app uses in-browser JavaScript (SHA-256) to hash uploaded files. It stores the hash (the "digital fingerprint") on-chain, not the file itself. This makes it possible to verify if the original file has been tampered with, even by one pixel.
+### 1. Clone the Repository
+```bash
+git clone https://github.com/yourusername/kaaval-chain.git
+cd kaaval-chain
+```
 
-Auditable Chain of Custody:
+### 2. Install Dependencies
+You need Python installed. Run the following command to install the required lightweight libraries:
 
-Access Grants: An SI can grant read-only access to another department, which is logged as an ACCESS_GRANT block.
+```bash
+pip install Flask qrcode pillow
+```
+*(Note: IPFS logic uses Python's standard library, so no heavy requests library is needed).*
 
-Ownership Transfers: An SI can transfer full case ownership to another department, logged as a TRANSFER_OWNERSHIP block.
+### 3. Configure Pinata (IPFS)
+To enable file uploads, you need free API keys from Pinata.
+1.  Sign up at [Pinata.cloud](https://www.pinata.cloud/).
+2.  Go to **API Keys** -> **New Key** (Select Admin).
+3.  Open `main.py` and find the configuration section:
+    ```python
+    # --- CONFIGURATION ---
+    PINATA_API_KEY = "PASTE_YOUR_API_KEY_HERE"
+    PINATA_SECRET_API_KEY = "PASTE_YOUR_SECRET_KEY_HERE"
+    ```
+4.  Paste your keys there.
 
-Case Visualization for Judiciary: A special "Case Mapper" tool for Judges to select any FIR and instantly see a clean, chronological timeline of every event in its history (creation, evidence added, grants, transfers).
-
-Additional scopes to be committed.
-
-How to Run This Project
-
-Prerequisites
-
-Python 3.x
-
-Flask
-
-Installation
-
-Clone the repository:
-git clone https://github.com/winash4567/kaaval-hackathon-project.git
-cd kaaval-hackathon-project
-
-Install Flask:
-python -m pip install Flask
-
-Run the application:
+### 4. Run the Application
+```bash
 python main.py
+```
+The application will start at `http://127.0.0.1:5000`.
 
-Open your web browser and go to:
-http://127.0.0.1:5000
+---
 
+## 🖥️ Usage Guide
+
+### Login Credentials
+The system comes pre-loaded with the following users for testing:
+
+| Role | Username | Password | Department | Capabilities |
+| :--- | :--- | :--- | :--- | :--- |
+| **SI (Officer)** | `si_state` | `pass` | State Police | Create FIR, Add Evidence, Transfer |
+| **Constable** | `constable_state` | `pass` | State Police | View Cases, Request Access |
+| **SI (Cyber)** | `si_cyber` | `pass` | Cyber Crime | Create FIR (Cyber Dept) |
+| **Judge** | `judge1` | `pass` | Judiciary | **Case Mapper**, Full Audit Log |
+
+### Demo Workflow
+1.  **Login as `si_state`**: Register a new FIR.
+2.  **Add Evidence**:
+    *   Select **Type: Document** -> Upload an image -> See the blue **IPFS Link** appear.
+    *   Select **Type: Physical** -> Enter details -> See the **QR Code** appear.
+3.  **Simulate Server Crash**: Stop the terminal (`Ctrl+C`) and restart it. Notice the data persists.
+4.  **Login as `judge1`**: Go to **Case Mapper**, select the FIR, and view the chronological timeline.
+
+---
+
+## 📂 Project Structure
+
+```text
+kaaval-chain/
+│
+├── main.py                # Core application (Flask + Blockchain Engine)
+├── chain_data.json        # Persistent ledger storage (Auto-generated)
+├── templates/             # Frontend HTML files
+│   ├── index.html         # Main Dashboard
+│   ├── login.html         # Login Page
+│   ├── inbox.html         # Notification Center
+│   ├── case_mapper.html   # Judge's Search Tool
+│   └── case_map_result.html # Visual Timeline
+└── README.md              # Documentation
+```
