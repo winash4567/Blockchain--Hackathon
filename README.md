@@ -1,17 +1,4 @@
-**Instructions:**
-1.  Create a file named `README.md` in your project folder.
-2.  Paste the text below into it.
-3.  (Optional) Take screenshots of your Dashboard and Case Mapper, name them `dashboard.png` and `timeline.png`, and add them to your folder to make the images appear.
-
----
-
-```markdown
 # 🛡️ Kaaval Chain: Immutable Evidence Management System
-
-![Python](https://img.shields.io/badge/Python-3.x-blue?style=for-the-badge&logo=python)
-![Flask](https://img.shields.io/badge/Flask-Web_Framework-red?style=for-the-badge&logo=flask)
-![IPFS](https://img.shields.io/badge/IPFS-Pinata-green?style=for-the-badge&logo=ipfs)
-![Status](https://img.shields.io/badge/Status-Prototype-orange?style=for-the-badge)
 
 **Kaaval Chain** is a blockchain-based digital ledger designed to maintain the Chain of Custody for forensic evidence. Built for the **T.N. Kaaval Hackathon 2025**, it solves the problem of evidence tampering by creating an immutable, decentralized record of every action taken by police officers and the judiciary.
 
