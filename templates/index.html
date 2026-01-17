@@ -12,6 +12,9 @@
     <!-- Feather Icons -->
     <script src="https://unpkg.com/feather-icons"></script>
 
+    <!-- CRITICAL FIX: CryptoJS for Hashing (Works on HTTP/Localhost) -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/crypto-js/4.1.1/crypto-js.min.js"></script>
+
     <style>
         :root {
             --primary-blue: #0d47a1;
@@ -93,13 +96,12 @@
         .owner-tag { color: var(--text-dark); background: #e0e0e0; }
         
         .data-list { list-style: none; padding-left: 0; margin-top: 10px; }
-        .data-list li { padding: 8px 0; border-bottom: 1px solid #f0f0f0; display: flex; }
+        .data-list li { padding: 8px 0; border-bottom: 1px solid #f0f0f0; display: flex; flex-wrap: wrap; }
         .data-list li:last-child { border-bottom: none; }
-        .data_list li strong { color: var(--text-light); width: 180px; flex-shrink: 0; }
+        .data-list li strong { color: var(--text-light); width: 180px; flex-shrink: 0; }
         
         .evidence-list { margin-left: 20px; border-left: 3px solid var(--primary-blue); padding-left: 20px; }
         .evidence-block { background: #f9fafb; border: 1px solid var(--border-color); padding: 15px; margin-top: 10px; border-radius: 6px; }
-        .evidence-block .data-list li strong { width: 150px; }
         
         .block-hash { font-family: 'Courier New', Courier, monospace; font-size: 14px; color: var(--text-light); background: #f9fafb; padding: 8px; border-radius: 4px; margin-top: 5px; word-break: break-all; }
         
@@ -128,7 +130,6 @@
         .tag-grant { color: #155724; background-color: #d4edda; }
         .tag-transfer { color: #856404; background-color: #fff3cd; }
         
-        /* NEW: Judge Tools */
         .judge-tools {
             background: #f0f2f5;
             padding: 20px;
@@ -172,7 +173,7 @@
             {% endif %}
         {% endwith %}
 
-        <!-- NEW: Judge Tools Section -->
+        <!-- Judge Tools Section -->
         {% if g.user and g.user.role == 'Judge' %}
         <div class="judge-tools">
             <h3>Judge's Toolkit</h3>
@@ -183,7 +184,7 @@
         </div>
         {% endif %}
 
-        <!-- SI Forms (Register FIR, Add Evidence) -->
+        <!-- SI Forms -->
         {% if g.user and g.user.role == 'SI' %}
         <div class="form-container">
             <!-- Form 1: Register New FIR -->
@@ -212,8 +213,8 @@
                 <button type="submit">Register FIR on Blockchain</button>
             </form>
             
-            <!-- Form 2: Add Evidence to FIR -->
-            <form action="/add_evidence" method="POST">
+            <!-- Form 2: Add Evidence -->
+            <form action="/add_evidence" method="POST" enctype="multipart/form-data">
                 <h3>Add Evidence to Existing FIR</h3>
                 
                 <div class="form-group">
@@ -237,8 +238,8 @@
                 </div>
                 
                 <div class="form-group" id="file_uploader_group">
-                    <label for="file_uploader">Upload Evidence File (to calculate hash)</label>
-                    <input type="file" id="file_uploader">
+                    <label for="file_uploader">Upload Evidence File (to calculate hash & IPFS)</label>
+                    <input type="file" id="file_uploader" name="evidence_file">
                 </div>
     
                 <div class="form-group">
@@ -290,9 +291,39 @@
                     {% for ev_block in item.evidence %}
                     <div class="evidence-block">
                         <ul class="data-list">
-                             {% for key, value in ev_block.data.items() %}
+                            {% for key, value in ev_block.data.items() %}
                                 {% if key != 'block_type' and key != 'linked_fir_hash' %}
-                                <li><strong>{{ key }}:</strong> {{ value }}</li>
+                                    
+                                    <!-- 1. CHECK FOR IPFS CID -->
+                                    {% if key == 'IPFS CID' and value != 'Not Uploaded (Physical/Other)' %}
+                                        <li>
+                                            <strong>{{ key }}:</strong> 
+                                            <a href="https://gateway.pinata.cloud/ipfs/{{ value }}" target="_blank" style="color: blue; text-decoration: underline;">
+                                                {{ value }} (View File)
+                                            </a>
+                                        </li>
+                                    
+                                    <!-- 2. CHECK FOR QR CODE (NEW) -->
+                                    {% elif key == 'QR Label' %}
+                                        {% if value %} <!-- Only show if QR exists -->
+                                        <li style="align-items: flex-start;">
+                                            <strong>Evidence Label:</strong>
+                                            <div>
+                                                <img src="data:image/png;base64,{{ value }}" alt="QR Code" style="width: 100px; height: 100px; border: 1px solid #ccc; padding: 5px;">
+                                                <br>
+                                                <a href="#" onclick="var win=window.open();win.document.write('<img src=\'data:image/png;base64,{{ value }}\' style=\'width:300px;\'>');win.print();" style="font-size: 12px; color: blue;">[Print Label]</a>
+                                            </div>
+                                        </li>
+                                        {% endif %}
+
+                                    <!-- 3. NORMAL FIELDS -->
+                                    {% else %}
+                                        <!-- Don't show empty QR fields -->
+                                        {% if key != 'QR Label' %}
+                                            <li><strong>{{ key }}:</strong> {{ value }}</li>
+                                        {% endif %}
+                                    {% endif %}
+
                                 {% endif %}
                             {% endfor %}
                         </ul>
@@ -410,8 +441,6 @@
                 </div>
                 <ul class="data-list">
                     <li><strong>Linked Case ID:</strong> 
-                        <!-- *** THIS IS THE FIX *** -->
-                        <!-- We now use the fir_state dict we passed in -->
                         {% if block.data.linked_fir_hash in fir_state %}
                             {{ fir_state[block.data.linked_fir_hash].fir_block.data['Case ID'] }}
                         {% else %}
@@ -419,6 +448,25 @@
                         {% endif %}
                     </li>
                     <li><strong>Evidence Type:</strong> {{ block.data['Evidence Type'] }}</li>
+                    
+                    <!-- IPFS Link in Audit Log -->
+                    {% if 'IPFS CID' in block.data and block.data['IPFS CID'] != 'Not Uploaded (Physical/Other)' %}
+                         <li>
+                            <strong>IPFS CID:</strong> 
+                            <a href="https://gateway.pinata.cloud/ipfs/{{ block.data['IPFS CID'] }}" target="_blank" style="color: blue; text-decoration: underline;">
+                                {{ block.data['IPFS CID'] }} (View File)
+                            </a>
+                        </li>
+                    {% endif %}
+
+                    <!-- QR Code in Audit Log (Optional but nice) -->
+                    {% if 'QR Label' in block.data and block.data['QR Label'] %}
+                        <li style="align-items: flex-start;">
+                            <strong>Evidence Label:</strong>
+                            <img src="data:image/png;base64,{{ block.data['QR Label'] }}" alt="QR Code" style="width: 80px; height: 80px; border: 1px solid #ccc;">
+                        </li>
+                    {% endif %}
+
                     <li><strong>Description:</strong> <span style="font-family: 'Courier New', monospace; font-size: 14px;">{{ block.data['Evidence File/Description'][:40] }}...</span></li>
                     <li><strong>Officer:</strong> {{ block.data.added_by_user }} ({{ block.data.added_by_dept }})</li>
                 </ul>
@@ -434,31 +482,51 @@
 
     </div>
 
-    <!-- JAVASCRIPT FOR FORM LOGIC (Unchanged) -->
+    <!-- JAVASCRIPT FOR FORM LOGIC (CryptoJS) -->
     <script>
         feather.replace()
     
         // Add a check for the file uploader element
         const fileUploader = document.getElementById('file_uploader');
         if (fileUploader) {
-            fileUploader.addEventListener('change', async (event) => {
+            fileUploader.addEventListener('change', function(event) {
                 const file = event.target.files[0];
                 if (!file) { return; }
+                
+                // Show loading state
                 document.getElementById('hash_spinner').style.display = 'inline-block';
                 const hashField = document.getElementById('description');
                 hashField.value = "Calculating hash...";
-                try {
-                    const buffer = await file.arrayBuffer();
-                    const hashBuffer = await crypto.subtle.digest('SHA-256', buffer);
-                    const hashArray = Array.from(new Uint8Array(hashBuffer));
-                    const hashHex = hashArray.map(b => b.toString(16).padStart(2, '0')).join('');
-                    hashField.value = hashHex;
-                } catch (error) {
-                    console.error("Hash calculation error:", error);
-                    hashField.value = "Error calculating hash.";
-                } finally {
+
+                // Use FileReader to read the file
+                const reader = new FileReader();
+                
+                reader.onload = function(e) {
+                    try {
+                        // Convert the file buffer to a WordArray for CryptoJS
+                        const wordArray = CryptoJS.lib.WordArray.create(e.target.result);
+                        
+                        // Calculate SHA256
+                        const hash = CryptoJS.SHA256(wordArray);
+                        
+                        // Update the input field with the Hex string
+                        hashField.value = hash.toString(CryptoJS.enc.Hex);
+                    } catch (error) {
+                        console.error("Hash calculation error:", error);
+                        hashField.value = "Error calculating hash.";
+                    } finally {
+                        // Hide spinner
+                        document.getElementById('hash_spinner').style.display = 'none';
+                    }
+                };
+
+                reader.onerror = function() {
+                    hashField.value = "Error reading file.";
                     document.getElementById('hash_spinner').style.display = 'none';
-                }
+                };
+
+                // Read the file as an ArrayBuffer
+                reader.readAsArrayBuffer(file);
             });
         }
 
